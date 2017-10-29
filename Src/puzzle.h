@@ -6,7 +6,6 @@
 #include <assert.h>
 #include <Windows.h>
 #include <map>
-#include "MinHeap.h"
 #include <ctime>
 
 
@@ -72,7 +71,7 @@ struct gridInfo
 	Coord coord;
 	bool isSource;
 	int gridId;
-	int heuristic;
+	int heuristic;	// heuristic = number of legal values
 	char color;		//'U' is means unassigned
 	vector<char> legalVal;
 	map<int, vector<char>>  discardedValue;
@@ -83,7 +82,6 @@ struct gridInfo
 		coord.column = column;
 		isSource = inIsSource;
 		gridId = columnSize*row + column;
-		heuristic = gridId;
 		color = inColor;
 		if (!isSource)
 		{
@@ -93,6 +91,7 @@ struct gridInfo
 		{
 			legalVal.push_back(inColor);
 		}
+		heuristic = legalVal.size();
 	}
 	GridInfo(){}
 };
@@ -118,11 +117,11 @@ private:
 	vector<GridInfo*> pendingGrids;		// the assigned grids. Use vector to function as stack
 	//vector<GridInfo*> sourceGrid;		// Source grids are kept in a seperate queue. Not to be touched in the pop/push process of CSP
 	// priority_queue<GridInfo*, vector<GridInfo*>, gridInfoLess> unAssignedGrids; // grids awaiting color assignment
-	MinHeap* unAssignedGrids;
+	vector<GridInfo*> unAssignedGrids;		//Heuristic is the number of legal value left
 	int numSourceGrids;
 public:
 	unsigned int numAssignment;
-
+	void printUnAssignedGridHeu();
 	void loadPuzzle();
 public:
 	CPuzzle(const char* inFilePath)

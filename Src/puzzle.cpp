@@ -35,8 +35,8 @@ void CPuzzle::initialize()
 	loadPuzzle();
 	columnSize = arr[0].size();
 	rowSize = arr.size();
-	unAssignedGrids = new MinHeap(rowSize*columnSize, getHeuristic);
-	unAssignedGrids->initialize();
+	//unAssignedGrids = new MinHeap(rowSize*columnSize, getHeuristic);
+	//unAssignedGrids->initialize();
 	vector<GridInfo*> row;
 	GridInfo* newGridInfo = NULL;
 
@@ -48,7 +48,7 @@ void CPuzzle::initialize()
 			{
 				newGridInfo = new GridInfo(rowIdx, columnIdx, columnSize, colors, false, 'U');
 				// only push non source grids to queue since source grids are not involved in the push/pop process of CSP
-				unAssignedGrids->insert(static_cast<void*>(newGridInfo));
+				unAssignedGrids.push_back(newGridInfo);
 			}
 			else
 			{
@@ -66,8 +66,8 @@ void CPuzzle::initialize()
 void CPuzzle::destroy()
 {
 	//unAssignedGrids->printAllValues();
-	unAssignedGrids->destroy();
-	delete unAssignedGrids;
+	//unAssignedGrids->destroy();
+	//delete unAssignedGrids;
 
 	for (int rowIdx = 0; rowIdx < rowSize; rowIdx++)
 	{
@@ -80,19 +80,47 @@ void CPuzzle::destroy()
 
 void CPuzzle::assignValue(GridInfo* grid, char val)
 {
+	vector<GridInfo*>::iterator it = find(unAssignedGrids.begin(),unAssignedGrids.end(),grid);
 	numAssignment++;
 	grid->color = val;
+	if (it != unAssignedGrids.end())
+	{
+		unAssignedGrids.erase(it);
+	}
 	pendingGrids.push_back(grid);
-	unAssignedGrids->extractMin();
+	//unAssignedGrids->extractMin();
 	//unAssignedGrids.pop();
 }
 
 GridInfo* CPuzzle::chooseGrid()
 {
-	//unAssignedGrids->printAllValues();
-	GridInfo* nextCoordToAssign = static_cast<GridInfo*>(unAssignedGrids->returnMin());
+	GridInfo* minHeuristicGrid = NULL;
+
+	// printUnAssignedGridHeu();
+
+	if (!unAssignedGrids.empty())
+	{
+		minHeuristicGrid = unAssignedGrids[0];
+		
+		for (auto &pGrid : unAssignedGrids)
+		{
+			if (pGrid->heuristic < minHeuristicGrid->heuristic)
+			{
+				minHeuristicGrid = pGrid;
+			}
+		}
+	}
 	//GridInfo* nextCoordToAssign = unAssignedGrids.top();
-	return nextCoordToAssign;
+	return minHeuristicGrid;
+}
+
+void CPuzzle::printUnAssignedGridHeu()
+{
+	for (auto &pGrid : unAssignedGrids)
+	{
+		printf("%d ", pGrid->heuristic);
+	}
+	printf("\n");
 }
 
 void CPuzzle::undoAssign(GridInfo* grid)
@@ -101,7 +129,7 @@ void CPuzzle::undoAssign(GridInfo* grid)
 	//assert(gridToUndo->gridId == grid->gridId);
 	pendingGrids.pop_back();
 	gridToUndo->color = 'U';
-	unAssignedGrids->insert(static_cast<void*>(gridToUndo));
+	unAssignedGrids.push_back(gridToUndo);
 	//unAssignedGrids.push(gridToUndo);
 }
 
@@ -341,9 +369,9 @@ void CPuzzle::test()
 
 void CPuzzle::printResult()
 {
-	/*COORD pos = { 0, 0 };
+	COORD pos = { 0, 1 };
 	HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
-	SetConsoleCursorPosition(output, pos);*/
+	SetConsoleCursorPosition(output, pos);
 
 	for (int rowIdx = 0; rowIdx < rowSize; rowIdx++)
 	{
@@ -369,7 +397,7 @@ bool CPuzzle::solve()
 		return true;
 	}
 
-	for (vector<char>::iterator it = colors.begin(); it != colors.end(); it++)
+	for (vector<char>::iterator it = nextGrid->legalVal.begin(); it != nextGrid->legalVal.end(); it++)
 	{
 		assignValue(nextGrid, *it);
 		//printResult();
@@ -422,6 +450,7 @@ void CPuzzle::discardLegalVal(GridInfo* myGrid, int discardGridID, char val)
 	{
 		myGrid->discardedValue[discardGridID].push_back(val);
 	}
+	myGrid->heuristic = myGrid->legalVal.size();
 }
 
 bool CPuzzle::forwardChecking(Coord responsibleGrid)
@@ -483,6 +512,7 @@ void CPuzzle::restoreGridLegalVal(GridInfo* thisGrid, int responsibleGridID)
 		thisGrid->legalVal.push_back(value);
 	}
 	thisGrid->discardedValue.erase(responsibleGridID);
+	thisGrid->heuristic = thisGrid->legalVal.size();
 }
 
 void CPuzzle::changedGridArcGen(Coord coordinate)
@@ -600,6 +630,7 @@ bool CPuzzle::gridArcCheck(pair<GridInfo*, GridInfo*> arcPair)
 			if (itLegalValToDiscard != causingGrid->legalVal.end())
 			{
 				causingGrid->legalVal.erase(itLegalValToDiscard);
+				causingGrid->heuristic = causingGrid->legalVal.size();
 			}
 
 			if (!isModified)
@@ -624,9 +655,9 @@ int main()
 		testPuzzle->initialize();
 		testPuzzle->puzzleArcCheck();
 		//testPuzzle->puzzleArcGen();
-		testPuzzle->test();
-		//canSolve = testPuzzle->solve();
-		//testPuzzle->printResult();
+		//testPuzzle->test();
+		canSolve = testPuzzle->solve();
+		testPuzzle->printResult();
 		printf("numAssignment:%u \n", testPuzzle->numAssignment);
 		if (!canSolve)
 		{
