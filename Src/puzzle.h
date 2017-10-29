@@ -5,7 +5,9 @@
 #include <fstream>
 #include <assert.h>
 #include <Windows.h>
+#include <map>
 #include "MinHeap.h"
+#include <ctime>
 
 
 using namespace std;
@@ -14,7 +16,10 @@ struct coord
 {
 	int column;
 	int row;
-	Coord(int inRow, int inColumn) :
+
+	Coord(){}	//default constructor
+
+	Coord(int inRow, int inColumn) : //custom constructor
 	column(inColumn),
 	row(inRow)
 	{}
@@ -64,21 +69,32 @@ struct coord
 typedef struct gridInfo GridInfo;
 struct gridInfo
 {
-	//Coord coord;
+	Coord coord;
 	bool isSource;
 	int gridId;
 	int heuristic;
 	char color;		//'U' is means unassigned
-	std::vector<char> legalVal;
+	vector<char> legalVal;
+	map<int, vector<char>>  discardedValue;
 
 	GridInfo(int row, int column, int columnSize, vector<char> colors, bool inIsSource, char inColor)
 	{
+		coord.row = row;
+		coord.column = column;
 		isSource = inIsSource;
 		gridId = columnSize*row + column;
 		heuristic = gridId;
 		color = inColor;
-		legalVal = colors;
+		if (!isSource)
+		{
+			legalVal = colors;
+		}
+		else
+		{
+			legalVal.push_back(inColor);
+		}
 	}
+	GridInfo(){}
 };
 
 struct gridInfoLess
@@ -97,12 +113,15 @@ class CPuzzle
 	vector<char> colors;		// all values that appear in the problem
 	int rowSize;
 	int columnSize;
+	vector<pair<GridInfo*, GridInfo*>> arcToCheck;	//only key is used in the map for lookup, vlaue is not used.
 private:
 	vector<GridInfo*> pendingGrids;		// the assigned grids. Use vector to function as stack
 	//vector<GridInfo*> sourceGrid;		// Source grids are kept in a seperate queue. Not to be touched in the pop/push process of CSP
 	// priority_queue<GridInfo*, vector<GridInfo*>, gridInfoLess> unAssignedGrids; // grids awaiting color assignment
 	MinHeap* unAssignedGrids;
 	int numSourceGrids;
+public:
+	unsigned int numAssignment;
 
 	void loadPuzzle();
 public:
@@ -110,6 +129,7 @@ public:
 	{
 		filePath = inFilePath;
 		numSourceGrids = 0;
+		numAssignment = 0;
 	}
 	static int getHeuristic(void* inGrid) { return static_cast<GridInfo*>(inGrid)->heuristic; }
 	void initialize();
@@ -122,5 +142,17 @@ public:
 	bool gridViolationCheck(Coord position);
 	bool solve();
 	void printResult();
+	bool forwardChecking(Coord currentCoord);
+	void discardLegalVal(GridInfo* myGrid, int discardGridID, char val);
+	void restorAdjGridLegalVal(Coord currentCoord);
+	void restoreGridLegalVal(GridInfo* thisGrid, int responsibleGridID);
+	vector<GridInfo*> getAdjGrids(Coord coordinate);
+
+	//for Arc Consistency
+	void changedGridArcGen(Coord coordinate); //push arc of adjacent grids to me
+	void gridArcGen(Coord coordinate);		  //push arc of me to adjacent grids
+	void puzzleArcGen();
+	void puzzleArcCheck();
+	bool gridArcCheck(pair<GridInfo*, GridInfo*> arcPair);
 	void test();
 };
