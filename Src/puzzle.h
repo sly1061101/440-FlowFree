@@ -105,10 +105,10 @@ class CPuzzle
 	int columnSize;
 	vector<pair<Coord, Coord>> arcToCheck;	//only key is used in the map for lookup, vlaue is not used.
 private:
-	vector<Coord> pendingGrids;		// the assigned grids. Use vector to function as stack
+	//vector<Coord> pendingGrids;		// the assigned grids. Use vector to function as stack
 	//vector<GridInfo*> sourceGrid;		// Source grids are kept in a seperate queue. Not to be touched in the pop/push process of CSP
 	// priority_queue<GridInfo*, vector<GridInfo*>, gridInfoLess> unAssignedGrids; // grids awaiting color assignment
-	vector<Coord> unAssignedGrids;		//Heuristic is the number of legal value left
+	//vector<Coord> unAssignedGrids;		//Heuristic is the number of legal value left
 	int numSourceGrids;
 public:
 	unsigned int numAssignment;
@@ -121,27 +121,28 @@ public:
 		numSourceGrids = 0;
 		numAssignment = 0;
 	}
+    void SetPuzzle(vector<vector<GridInfo>> p){puzzle = p;}
 	static int getHeuristic(void* inGrid) { return static_cast<GridInfo*>(inGrid)->heuristic; }
 	void initialize();
-	bool allAssigned(){return (pendingGrids.size() == (rowSize*columnSize - numSourceGrids));}
+    bool allAssigned();
     void assignValue(Coord grid, char val);
 	Coord chooseGrid();
-    void undoAssign(Coord grid);
+    //void undoAssign(Coord grid);
 	bool puzzleViolationCheck();
 	bool gridViolationCheck(Coord position);
-	bool solve();
+	bool solve(CPuzzle *p, unsigned int *numAssignment);
 	void printResult();
 	bool forwardChecking(Coord currentCoord);
-    void discardLegalVal(Coord myGrid, int discardGridID, char val);
-	void restorAdjGridLegalVal(Coord currentCoord);
-	void restoreGridLegalVal(Coord thisGrid, int responsibleGridID);
+    //void discardLegalVal(Coord myGrid, int discardGridID, char val);
+	//void restorAdjGridLegalVal(Coord currentCoord);
+	//void restoreGridLegalVal(Coord thisGrid, int responsibleGridID);
     vector<Coord> getAdjGrids(Coord position);
 
 	//for Arc Consistency
 	void changedGridArcGen(Coord coordinate); //push arc of adjacent grids to me
 	void gridArcGen(Coord coordinate);		  //push arc of me to adjacent grids
 	void puzzleArcGen();
-	void puzzleArcCheck();
+	bool puzzleArcCheck();
     bool gridArcCheck(pair<Coord, Coord> arcPair);
 	void test();
 

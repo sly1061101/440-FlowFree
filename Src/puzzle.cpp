@@ -48,7 +48,7 @@ void CPuzzle::initialize()
 			{
 				newGridInfo.SetInfo(rowIdx, columnIdx, columnSize, colors, false, 'U');
 				// only push non source grids to queue since source grids are not involved in the push/pop process of CSP
-				unAssignedGrids.push_back(newGridInfo.coord);
+				//unAssignedGrids.push_back(newGridInfo.coord);
 			}
 			else
 			{
@@ -63,38 +63,54 @@ void CPuzzle::initialize()
 	}
 }
 
+bool CPuzzle::allAssigned(){
+    bool allAssigned = true;
+    for(auto &i: puzzle){
+        for(auto &j: i){
+            if(j.color == 'U'){
+                allAssigned = false;
+                break;
+            }
+        }
+        if(allAssigned == false)
+            break;
+    }
+    return allAssigned;
+}
+
 void CPuzzle::assignValue(Coord grid, char val)
 {
-    vector<Coord>::iterator it = find(unAssignedGrids.begin(),unAssignedGrids.end(),grid);
+    //vector<Coord>::iterator it = find(unAssignedGrids.begin(),unAssignedGrids.end(),grid);
     numAssignment++;
     puzzle[grid.row][grid.column].color = val;
-    if (it != unAssignedGrids.end())
-    {
-        unAssignedGrids.erase(it);
-    }
-    pendingGrids.push_back(grid);
+//    if (it != unAssignedGrids.end())
+//    {
+//        unAssignedGrids.erase(it);
+//    }
+//    pendingGrids.push_back(grid);
     //unAssignedGrids->extractMin();
     //unAssignedGrids.pop();
 }
 
 Coord CPuzzle::chooseGrid()
 {
-    Coord Id;
+    Coord Id(0,0);
 
     // printUnAssignedGridHeu();
 
-    if (!unAssignedGrids.empty())
-    {
-        Id = unAssignedGrids[0];
-
-        for (auto &i : unAssignedGrids)
-        {
-            if ( puzzle[i.row][i.column].legalVal.size() < puzzle[Id.row][Id.column].legalVal.size() )
-            {
-                Id = i;
+    for (int i = 0; i<rowSize; ++i){
+        for(int j = 0; j<columnSize; ++j){
+            if(puzzle[i][j].color == 'U'){
+                if( (Id.row == 0) && (Id.column == 0) )
+                    Id = puzzle[i][j].coord;
+//                if ( puzzle[i][j].legalVal.size() < puzzle[Id.row][Id.column].legalVal.size() )
+//                {
+//                    Id = puzzle[i][j].coord;
+//                }
             }
         }
     }
+
     //GridInfo* nextCoordToAssign = unAssignedGrids.top();
     return Id;
 }
@@ -108,15 +124,15 @@ Coord CPuzzle::chooseGrid()
 //    printf("\n");
 //}
 
-void CPuzzle::undoAssign(Coord grid)
-{
-    Coord gridToUndo = pendingGrids.back(); //pop the last element from stack
-    //assert(gridToUndo->gridId == grid->gridId);
-    pendingGrids.pop_back();
-    puzzle[gridToUndo.row][gridToUndo.column].color = 'U';
-    unAssignedGrids.push_back(gridToUndo);
-    //unAssignedGrids.push(gridToUndo);
-}
+//void CPuzzle::undoAssign(Coord grid)
+//{
+//    Coord gridToUndo = pendingGrids.back(); //pop the last element from stack
+//    //assert(gridToUndo->gridId == grid->gridId);
+//    pendingGrids.pop_back();
+//    puzzle[gridToUndo.row][gridToUndo.column].color = 'U';
+//    unAssignedGrids.push_back(gridToUndo);
+//    //unAssignedGrids.push(gridToUndo);
+//}
 
 bool CPuzzle::puzzleViolationCheck()
 {
@@ -210,7 +226,7 @@ bool CPuzzle::gridViolationCheck(Coord position)
         }
     }
     
-    //is source grid
+    //not source grid
     if ( !puzzle[position.row][position.column].isSource )
     {
         // no matching, only good when more than 2 unassigned grids are available
@@ -248,7 +264,7 @@ bool CPuzzle::gridViolationCheck(Coord position)
             }
         }
     }
-    //not source grid
+    //is source grid
     else
     {
         if (numMatch == 1)
@@ -365,75 +381,87 @@ void CPuzzle::printResult()
     printf("\n");
 }
 
-bool CPuzzle::solve()
+bool CPuzzle::solve(CPuzzle *p, unsigned int *numAssignment)
 {
-    Coord nextGrid = chooseGrid();
-    bool isValid = true;
-
-    //assert(nextGrid != NULL);
-    //assert((pendingGrids.size()+unAssignedGrids.size()) == ((columnSize*rowSize) - numSourceGrids));
-
-    if (allAssigned())
-    {
+    if ( allAssigned() ){
+        if(p != NULL)
+            (*p).SetPuzzle( (*this).puzzle );
+        (*numAssignment) += this->numAssignment;
         return true;
     }
-
+    
+    Coord nextGrid = chooseGrid();
+    bool isValid = true;
+    
     for ( auto &it: puzzle[nextGrid.row][nextGrid.column].legalVal )
     {
-        assignValue(nextGrid, it);
-        //printResult();
-        isValid = puzzleViolationCheck();
+        CPuzzle p_next = (*this);
+        
+        p_next.assignValue(nextGrid, it);
+
+        isValid = p_next.puzzleViolationCheck();
 
         if (isValid)
         {
-            isValid = forwardChecking(puzzle[nextGrid.row][nextGrid.column].coord);
+            isValid = p_next.forwardChecking(puzzle[nextGrid.row][nextGrid.column].coord);
+        }
+        
+        if (isValid)
+        {
+            isValid = p_next.puzzleArcCheck();
+            printf("%s\n",isValid==true?"True":"False");
         }
 
         if (!isValid)
         {
-            undoAssign(nextGrid);
+            //undoAssign(nextGrid);
             //restorAdjGridLegalVal(puzzle[nextGrid.row][nextGrid.column].coord);
             continue;
         }
         else
         {
-            isValid = solve();
+            p_next.printResult();
+            
+            if(p == NULL)
+                isValid = p_next.solve(this, &(this->numAssignment) );
+            else
+                isValid = p_next.solve(this, numAssignment);
+            
             if (isValid)
             {
+                if(p != NULL){
+                    (*p).SetPuzzle( (*this).puzzle );
+                    (*numAssignment) += this->numAssignment;
+                }
                 return true;
-            }
-            else
-            {
-                undoAssign(nextGrid);
-                //restorAdjGridLegalVal(puzzle[nextGrid.row][nextGrid.column].coord);
             }
         }
     }
     return false;
 }
 
-void CPuzzle::discardLegalVal(Coord myGrid, int discardGridID, char val)
-{
-    //remove value from legalValue
-    vector<char>::iterator it = find(puzzle[myGrid.row][myGrid.column].legalVal.begin(), puzzle[myGrid.row][myGrid.column].legalVal.end(), val);
-    // == myVector.end() means the element was not found
-    if (it != puzzle[myGrid.row][myGrid.column].legalVal.end())
-    {
-        puzzle[myGrid.row][myGrid.column].legalVal.erase(it);
-    }
-    //save removed value to discarded value
-    if (puzzle[myGrid.row][myGrid.column].discardedValue.count(discardGridID) == 0)
-    {
-        vector<char> newVector = {val};
-        puzzle[myGrid.row][myGrid.column].discardedValue.insert(pair<int, vector<char>>(discardGridID, newVector));
-        puzzle[myGrid.row][myGrid.column].discardedValue[discardGridID].push_back(val);
-    }
-    else
-    {
-        puzzle[myGrid.row][myGrid.column].discardedValue[discardGridID].push_back(val);
-    }
-    puzzle[myGrid.row][myGrid.column].heuristic = puzzle[myGrid.row][myGrid.column].legalVal.size();
-}
+//void CPuzzle::discardLegalVal(Coord myGrid, int discardGridID, char val)
+//{
+//    //remove value from legalValue
+//    vector<char>::iterator it = find(puzzle[myGrid.row][myGrid.column].legalVal.begin(), puzzle[myGrid.row][myGrid.column].legalVal.end(), val);
+//    // == myVector.end() means the element was not found
+//    if (it != puzzle[myGrid.row][myGrid.column].legalVal.end())
+//    {
+//        puzzle[myGrid.row][myGrid.column].legalVal.erase(it);
+//    }
+//    //save removed value to discarded value
+//    if (puzzle[myGrid.row][myGrid.column].discardedValue.count(discardGridID) == 0)
+//    {
+//        vector<char> newVector = {val};
+//        puzzle[myGrid.row][myGrid.column].discardedValue.insert(pair<int, vector<char>>(discardGridID, newVector));
+//        puzzle[myGrid.row][myGrid.column].discardedValue[discardGridID].push_back(val);
+//    }
+//    else
+//    {
+//        puzzle[myGrid.row][myGrid.column].discardedValue[discardGridID].push_back(val);
+//    }
+//    puzzle[myGrid.row][myGrid.column].heuristic = puzzle[myGrid.row][myGrid.column].legalVal.size();
+//}
 
 bool CPuzzle::forwardChecking(Coord responsibleGrid)
 {
@@ -476,28 +504,28 @@ bool CPuzzle::forwardChecking(Coord responsibleGrid)
     return true;
 }
 
-void CPuzzle::restorAdjGridLegalVal(Coord responsibleCoord)
-{
-    vector<Coord> adjGrids = getAdjGrids(responsibleCoord);
-    for (auto &pGrid : adjGrids)
-    {
-        if (puzzle[pGrid.row][pGrid.column].color == 'U')
-        {
-            restoreGridLegalVal(pGrid, puzzle[responsibleCoord.row][responsibleCoord.column].gridId);
-        }
-    }
-}
+//void CPuzzle::restorAdjGridLegalVal(Coord responsibleCoord)
+//{
+//    vector<Coord> adjGrids = getAdjGrids(responsibleCoord);
+//    for (auto &pGrid : adjGrids)
+//    {
+//        if (puzzle[pGrid.row][pGrid.column].color == 'U')
+//        {
+//            restoreGridLegalVal(pGrid, puzzle[responsibleCoord.row][responsibleCoord.column].gridId);
+//        }
+//    }
+//}
 
-void CPuzzle::restoreGridLegalVal(Coord thisGrid, int responsibleGridID)
-{
-    //GridInfo* pGrid = puzzle[currentCoord.row][currentCoord.column];
-    for (auto &value : puzzle[thisGrid.row][thisGrid.column].discardedValue[responsibleGridID])
-    {
-        puzzle[thisGrid.row][thisGrid.column].legalVal.push_back(value);
-    }
-    puzzle[thisGrid.row][thisGrid.column].discardedValue.erase(responsibleGridID);
-    puzzle[thisGrid.row][thisGrid.column].heuristic = puzzle[thisGrid.row][thisGrid.column].legalVal.size();
-}
+//void CPuzzle::restoreGridLegalVal(Coord thisGrid, int responsibleGridID)
+//{
+//    //GridInfo* pGrid = puzzle[currentCoord.row][currentCoord.column];
+//    for (auto &value : puzzle[thisGrid.row][thisGrid.column].discardedValue[responsibleGridID])
+//    {
+//        puzzle[thisGrid.row][thisGrid.column].legalVal.push_back(value);
+//    }
+//    puzzle[thisGrid.row][thisGrid.column].discardedValue.erase(responsibleGridID);
+//    puzzle[thisGrid.row][thisGrid.column].heuristic = puzzle[thisGrid.row][thisGrid.column].legalVal.size();
+//}
 
 void CPuzzle::changedGridArcGen(Coord coordinate)
 {
@@ -505,15 +533,15 @@ void CPuzzle::changedGridArcGen(Coord coordinate)
     vector<Coord> adjGrids = getAdjGrids(coordinate);
     for (auto &causingGrid : adjGrids)
     {
-        if (!puzzle[causingGrid.row][causingGrid.column].isSource)
+        if ( puzzle[causingGrid.row][causingGrid.column].color == 'U' )
         {
             pair<Coord, Coord> arcPair;
             arcPair.first = causingGrid;
             arcPair.second = pEffectedGrid;
-            //if ( find(arcToCheck.begin(), arcToCheck.end(), arcPair)== arcToCheck.end())
-            //{
-                arcToCheck.push_back(arcPair);
-            //}
+//            bool exist = false;
+//            for(auto &i:arcToCheck)
+//
+            arcToCheck.push_back(arcPair);
         }
     }
 }
@@ -543,7 +571,7 @@ void CPuzzle::puzzleArcGen()
     {
         for (int columnIdx = 0; columnIdx < columnSize; columnIdx++)
         {
-            if (!puzzle[rowIdx][columnIdx].isSource)
+            if ( puzzle[rowIdx][columnIdx].color == 'U' )
             {
                 gridArcGen(puzzle[rowIdx][columnIdx].coord);
             }
@@ -552,30 +580,27 @@ void CPuzzle::puzzleArcGen()
 }
 
 //eliminate bad legal value of all grids in puzzle
-void CPuzzle::puzzleArcCheck()
+bool CPuzzle::puzzleArcCheck()
 {
-    bool isModified = false; //is legalVal of causing grid modified?
     pair<Coord, Coord> arcPair;
     puzzleArcGen();
     while (!arcToCheck.empty())
     {
+        bool isModified = false; //is legalVal of causing grid modified?
         //arcPair.first is the causing grid, arcPair.second is the effected grid
         arcPair = arcToCheck.front();
         arcToCheck.erase(arcToCheck.begin());
-        //for debugging==================
-        if (puzzle[0][0].color == 'U')
-        {
-            int o = 1;
-        }
-        //===============================
         // check consistancy of arc pair, and remove legalVal of causing grid if their is arc violation
         isModified = gridArcCheck(arcPair);
         if (isModified)
         {
+            if( puzzle[arcPair.first.row][arcPair.first.column].legalVal.size() == 0 )
+                return false;
             // causing grid has change in legal value, add arc of other grid to the causing grid
             changedGridArcGen(arcPair.first);
         }
     }
+    return true;
 }
 
 // check consistancy of arc pair, and remove legalVal of causing grid if their is arc violation
@@ -593,12 +618,14 @@ bool CPuzzle::gridArcCheck(pair<Coord, Coord> arcPair)
         puzzle[causingGrid.row][causingGrid.column].color = causeVal;
         for (auto &effVal : puzzle[effectedGrid.row][effectedGrid.column].legalVal)
         {
-            if (!puzzle[effectedGrid.row][effectedGrid.column].isSource)
+            bool IsUnassignedGrid = ( puzzle[effectedGrid.row][effectedGrid.column].color == 'U' );
+            
+            if ( IsUnassignedGrid )
             {
                 puzzle[effectedGrid.row][effectedGrid.column].color = effVal;
             }
             isValid = puzzleViolationCheck();
-            if (!puzzle[effectedGrid.row][effectedGrid.column].isSource)
+            if ( IsUnassignedGrid )
             {
                 puzzle[effectedGrid.row][effectedGrid.column].color = 'U';
             }
@@ -617,43 +644,8 @@ bool CPuzzle::gridArcCheck(pair<Coord, Coord> arcPair)
                 puzzle[causingGrid.row][causingGrid.column].heuristic = puzzle[causingGrid.row][causingGrid.column].legalVal.size();
             }
 
-            if (!isModified)
-            {
-                isModified = true;
-            }
+            isModified = true;
         }
     }
     return isModified;
 }
-
-//int main_o()
-//{
-//    //char* fileNames[3] = { "1212.txt","1214.txt","1414.txt" };
-//    //for (int i = 0; i < 3; i++)
-//    //{
-//        using namespace std;
-//        clock_t begin = clock();
-//
-//        bool canSolve = true;
-//        CPuzzle* testPuzzle = new CPuzzle("puzzle.txt");
-//        testPuzzle->initialize();
-//        testPuzzle->puzzleArcCheck();
-//        //testPuzzle->puzzleArcGen();
-//        //testPuzzle->test();
-//        canSolve = testPuzzle->solve();
-//        testPuzzle->printResult();
-//        printf("numAssignment:%u \n", testPuzzle->numAssignment);
-//        if (!canSolve)
-//        {
-//            printf("cannot solve problem\n \n");
-//        }
-//        testPuzzle->destroy();
-//
-//        clock_t end = clock();
-//        double elapsed_secs = double(end - begin) / (CLOCKS_PER_SEC/1000);
-//        cout << "time: " << elapsed_secs << endl;
-//    //}
-//
-//    return 0;
-//}
-
