@@ -405,22 +405,26 @@ bool CPuzzle::solve(CPuzzle *p, unsigned int *numAssignment)
         {
             isValid = p_next.forwardChecking(puzzle[nextGrid.row][nextGrid.column].coord);
         }
+        //printf("FORWARD:%s\n",isValid==true?"True":"False");
         
         if (isValid)
         {
             isValid = p_next.puzzleArcCheck();
-            printf("%s\n",isValid==true?"True":"False");
+            //printf("ARC:%s\n",isValid==true?"True":"False");
         }
 
         if (!isValid)
         {
             //undoAssign(nextGrid);
             //restorAdjGridLegalVal(puzzle[nextGrid.row][nextGrid.column].coord);
+            if(p != NULL){
+                (*numAssignment) += this->numAssignment;
+            }
             continue;
         }
         else
         {
-            p_next.printResult();
+            //p_next.printResult();
             
             if(p == NULL)
                 isValid = p_next.solve(this, &(this->numAssignment) );
