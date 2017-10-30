@@ -13,6 +13,9 @@ int main(){
     CPuzzle testPuzzle("puzzle.txt");
     testPuzzle.initialize();
     testPuzzle.printResult();
+    testPuzzle.test();
+    testPuzzle.puzzleArcCheck();
+    testPuzzle.test();
     testPuzzle.solve();
     testPuzzle.printResult();
     return 0;

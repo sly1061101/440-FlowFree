@@ -38,12 +38,12 @@ void CPuzzle::initialize()
 	//unAssignedGrids = new MinHeap(rowSize*columnSize, getHeuristic);
 	//unAssignedGrids->initialize();
 	vector<GridInfo> row;
-	GridInfo newGridInfo;
 
 	for (int rowIdx = 0; rowIdx < rowSize; rowIdx++)
 	{
 		for (int columnIdx = 0; columnIdx < columnSize; columnIdx++)
 		{
+            GridInfo newGridInfo;
 			if (arr[rowIdx][columnIdx] == '_')
 			{
 				newGridInfo.SetInfo(rowIdx, columnIdx, columnSize, colors, false, 'U');
@@ -89,7 +89,7 @@ Coord CPuzzle::chooseGrid()
 
         for (auto &i : unAssignedGrids)
         {
-            if ( puzzle[i.row][i.column].heuristic < puzzle[Id.row][Id.column].heuristic )
+            if ( puzzle[i.row][i.column].legalVal.size() < puzzle[Id.row][Id.column].legalVal.size() )
             {
                 Id = i;
             }
@@ -274,82 +274,83 @@ bool CPuzzle::gridViolationCheck(Coord position)
 
 }
 
-//void CPuzzle::test()
-//{
-//    //print all recorded arc relationship
-//    for (auto &arcMap : arcToCheck)
-//    {
-//        printf("%d -> %d \n",arcMap.first->gridId, arcMap.second->gridId);
-//    }
-//    for (int rowIdx = 0; rowIdx < rowSize; rowIdx++)
-//    {
-//        for (int columnIdx = 0; columnIdx < columnSize; columnIdx++)
-//        {
-//            printf("%d ", puzzle[rowIdx][columnIdx]->legalVal.size());
-//        }
-//        printf("\n");
-//    }
-//    /*
-//    // test min heap
-//    GridInfo* temp = static_cast<GridInfo*>(unAssignedGrids->extractMin());
-//    GridInfo* insertBack = NULL;
-//    int insertEveryTwoItr = 0;
-//    while (temp)
-//    {
-//        printf("%d\n", temp->heuristic);
-//        unAssignedGrids->printAllValues();
-//        if (insertEveryTwoItr == 1)
-//        {
-//            insertBack = temp;
-//        }
-//        if (insertEveryTwoItr <=2)
-//        {
-//            temp = static_cast<GridInfo*>(unAssignedGrids->extractMin());
-//        }
-//        else
-//        {
-//            unAssignedGrids->insert(static_cast<void*>(insertBack));
-//            insertEveryTwoItr = 0;
-//        }
-//        insertEveryTwoItr++;
-//    }
-//    */
-//    //for (int i = 0; i < (rowSize*columnSize); i++)
-//    //{
-//    //    GridInfo* dummy=NULL;
-//    //    pendingGrids.push_back(dummy);
-//    //}
-//
-//    //Coord grid(3, 4);
-//    //printf("%d\n",puzzleViolationCheck());
-//    
-//    /*GridInfo* cause[8];
-//    GridInfo* effected[8];
-//    for (int i = 0; i < 8; i++)
-//    {
-//        cause[i] = new GridInfo;
-//        effected[i] = new GridInfo;
-//        pair<GridInfo*, GridInfo*> arcPair;
-//        arcPair.first = cause[i];
-//        arcPair.second = effected[i];
-//        arcToCheck[arcPair] = true;
-//    }
-//    pair<GridInfo*, GridInfo*> arcPair;
-//    arcPair.first = cause[7];
-//    arcPair.second = effected[7];
-//    printf("key cound:%d \n", arcToCheck.count(arcPair));
-//    printf("kfirst pair:%u -> %u\n", arcToCheck.begin()->first, arcToCheck.begin()->second);
-//    for (int i = 0; i < 8; i++)
-//    {
-//        delete cause[i];
-//        delete effected[i];
-//    }*/
-//
-//    /*puzzleArcGen();
-//    printf("%d\n", arcToCheck.size());*/
-//    
-//
-//}
+void CPuzzle::test()
+{
+    //print all recorded arc relationship
+    for (auto &arcMap : arcToCheck)
+    {
+        printf("%d -> %d \n",puzzle[arcMap.first.row][arcMap.first.column].gridId, puzzle[arcMap.second.row][arcMap.second.column].gridId);
+    }
+    for (int rowIdx = 0; rowIdx < rowSize; rowIdx++)
+    {
+        for (int columnIdx = 0; columnIdx < columnSize; columnIdx++)
+        {
+            printf("%d ", puzzle[rowIdx][columnIdx].legalVal.size());
+        }
+        printf("\n");
+    }
+    printf("\n");
+    /*
+    // test min heap
+    GridInfo* temp = static_cast<GridInfo*>(unAssignedGrids->extractMin());
+    GridInfo* insertBack = NULL;
+    int insertEveryTwoItr = 0;
+    while (temp)
+    {
+        printf("%d\n", temp->heuristic);
+        unAssignedGrids->printAllValues();
+        if (insertEveryTwoItr == 1)
+        {
+            insertBack = temp;
+        }
+        if (insertEveryTwoItr <=2)
+        {
+            temp = static_cast<GridInfo*>(unAssignedGrids->extractMin());
+        }
+        else
+        {
+            unAssignedGrids->insert(static_cast<void*>(insertBack));
+            insertEveryTwoItr = 0;
+        }
+        insertEveryTwoItr++;
+    }
+    */
+    //for (int i = 0; i < (rowSize*columnSize); i++)
+    //{
+    //    GridInfo* dummy=NULL;
+    //    pendingGrids.push_back(dummy);
+    //}
+
+    //Coord grid(3, 4);
+    //printf("%d\n",puzzleViolationCheck());
+    
+    /*GridInfo* cause[8];
+    GridInfo* effected[8];
+    for (int i = 0; i < 8; i++)
+    {
+        cause[i] = new GridInfo;
+        effected[i] = new GridInfo;
+        pair<GridInfo*, GridInfo*> arcPair;
+        arcPair.first = cause[i];
+        arcPair.second = effected[i];
+        arcToCheck[arcPair] = true;
+    }
+    pair<GridInfo*, GridInfo*> arcPair;
+    arcPair.first = cause[7];
+    arcPair.second = effected[7];
+    printf("key cound:%d \n", arcToCheck.count(arcPair));
+    printf("kfirst pair:%u -> %u\n", arcToCheck.begin()->first, arcToCheck.begin()->second);
+    for (int i = 0; i < 8; i++)
+    {
+        delete cause[i];
+        delete effected[i];
+    }*/
+
+    /*puzzleArcGen();
+    printf("%d\n", arcToCheck.size());*/
+    
+
+}
 
 void CPuzzle::printResult()
 {
@@ -494,132 +495,132 @@ void CPuzzle::restoreGridLegalVal(Coord thisGrid, int responsibleGridID)
     puzzle[thisGrid.row][thisGrid.column].heuristic = puzzle[thisGrid.row][thisGrid.column].legalVal.size();
 }
 
-//void CPuzzle::changedGridArcGen(Coord coordinate)
-//{
-//    GridInfo* pEffectedGrid = puzzle[coordinate.row][coordinate.column];
-//    vector<GridInfo*> adjGrids = getAdjGrids(coordinate);
-//    for (auto &causingGrid : adjGrids)
-//    {
-//        if (!causingGrid->isSource)
-//        {
-//            pair<GridInfo*, GridInfo*> arcPair;
-//            arcPair.first = causingGrid;
-//            arcPair.second = pEffectedGrid;
-//            //if ( find(arcToCheck.begin(), arcToCheck.end(), arcPair)== arcToCheck.end())
-//            //{
-//                arcToCheck.push_back(arcPair);
-//            //}
-//        }
-//    }
-//}
-//
-//void CPuzzle::gridArcGen(Coord coordinate)
-//{
-//    GridInfo* causeGrid = puzzle[coordinate.row][coordinate.column];
-//    vector<GridInfo*> adjGrids = getAdjGrids(coordinate);
-//    for (auto &pEffectedGrid : adjGrids)
-//    {
-//        //if (!pEffectedGrid->isSource)
-//        //{
-//            pair<GridInfo*, GridInfo*> arcPair;
-//            arcPair.first = causeGrid;
-//            arcPair.second = pEffectedGrid;
-//            //if (find(arcToCheck.begin(), arcToCheck.end(), arcPair) == arcToCheck.end())
-//            //{
-//                arcToCheck.push_back(arcPair);
-//            //}
-//        //}
-//    }
-//}
-//
-//void CPuzzle::puzzleArcGen()
-//{
-//    for (int rowIdx = 0; rowIdx < rowSize; rowIdx++)
-//    {
-//        for (int columnIdx = 0; columnIdx < columnSize; columnIdx++)
-//        {
-//            if (!puzzle[rowIdx][columnIdx]->isSource)
-//            {
-//                gridArcGen(puzzle[rowIdx][columnIdx]->coord);
-//            }
-//        }
-//    }
-//}
-//
-////eliminate bad legal value of all grids in puzzle
-//void CPuzzle::puzzleArcCheck()
-//{
-//    bool isModified = false; //is legalVal of causing grid modified?
-//    pair<GridInfo*, GridInfo*> arcPair;
-//    puzzleArcGen();
-//    while (!arcToCheck.empty())
-//    {
-//        //arcPair.first is the causing grid, arcPair.second is the effected grid
-//        arcPair = arcToCheck.front();
-//        arcToCheck.erase(arcToCheck.begin());
-//        //for debugging==================
-//        if (puzzle[0][0]->color == 'U')
-//        {
-//            int o = 1;
-//        }
-//        //===============================
-//        // check consistancy of arc pair, and remove legalVal of causing grid if their is arc violation
-//        isModified = gridArcCheck(arcPair);
-//        if (isModified)
-//        {
-//            // causing grid has change in legal value, add arc of other grid to the causing grid
-//            changedGridArcGen(arcPair.first->coord);
-//        }
-//    }
-//}
-//
-//// check consistancy of arc pair, and remove legalVal of causing grid if their is arc violation
-//bool CPuzzle::gridArcCheck(pair<GridInfo*, GridInfo*> arcPair)
-//{
-//    bool isModified = false;
-//    bool isValid = false;
-//    GridInfo* causingGrid = arcPair.first;
-//    GridInfo* effectedGrid = arcPair.second;
-//    vector<char> causeLegalValCopy = causingGrid->legalVal;
-//    vector<char>::iterator itLegalValToDiscard;
-//    for (auto &causeVal : causeLegalValCopy)
-//    {
-//        isValid = false;
-//        causingGrid->color = causeVal;
-//        for (auto &effVal : effectedGrid->legalVal)
-//        {
-//            if (!effectedGrid->isSource)
-//            {
-//                effectedGrid->color = effVal;
-//            }
-//            isValid = puzzleViolationCheck();
-//            if (!effectedGrid->isSource)
-//            {
-//                effectedGrid->color = 'U';
-//            }
-//            if (isValid)
-//            {
-//                break;
-//            }
-//        }
-//        causingGrid->color = 'U';
-//        if (!isValid)
-//        {
-//            itLegalValToDiscard = find(causingGrid->legalVal.begin(), causingGrid->legalVal.end(), causeVal);
-//            if (itLegalValToDiscard != causingGrid->legalVal.end())
-//            {
-//                causingGrid->legalVal.erase(itLegalValToDiscard);
-//                causingGrid->heuristic = causingGrid->legalVal.size();
-//            }
-//
-//            if (!isModified)
-//            {
-//                isModified = true;
-//            }
-//        }
-//    }
-//    return isModified;
-//}
+void CPuzzle::changedGridArcGen(Coord coordinate)
+{
+    Coord pEffectedGrid = coordinate;
+    vector<Coord> adjGrids = getAdjGrids(coordinate);
+    for (auto &causingGrid : adjGrids)
+    {
+        if (!puzzle[causingGrid.row][causingGrid.column].isSource)
+        {
+            pair<Coord, Coord> arcPair;
+            arcPair.first = causingGrid;
+            arcPair.second = pEffectedGrid;
+            //if ( find(arcToCheck.begin(), arcToCheck.end(), arcPair)== arcToCheck.end())
+            //{
+                arcToCheck.push_back(arcPair);
+            //}
+        }
+    }
+}
+
+void CPuzzle::gridArcGen(Coord coordinate)
+{
+    Coord causeGrid = coordinate;
+    vector<Coord> adjGrids = getAdjGrids(coordinate);
+    for (auto &pEffectedGrid : adjGrids)
+    {
+        //if (!pEffectedGrid->isSource)
+        //{
+            pair<Coord, Coord> arcPair;
+            arcPair.first = causeGrid;
+            arcPair.second = pEffectedGrid;
+            //if (find(arcToCheck.begin(), arcToCheck.end(), arcPair) == arcToCheck.end())
+            //{
+                arcToCheck.push_back(arcPair);
+            //}
+        //}
+    }
+}
+
+void CPuzzle::puzzleArcGen()
+{
+    for (int rowIdx = 0; rowIdx < rowSize; rowIdx++)
+    {
+        for (int columnIdx = 0; columnIdx < columnSize; columnIdx++)
+        {
+            if (!puzzle[rowIdx][columnIdx].isSource)
+            {
+                gridArcGen(puzzle[rowIdx][columnIdx].coord);
+            }
+        }
+    }
+}
+
+//eliminate bad legal value of all grids in puzzle
+void CPuzzle::puzzleArcCheck()
+{
+    bool isModified = false; //is legalVal of causing grid modified?
+    pair<Coord, Coord> arcPair;
+    puzzleArcGen();
+    while (!arcToCheck.empty())
+    {
+        //arcPair.first is the causing grid, arcPair.second is the effected grid
+        arcPair = arcToCheck.front();
+        arcToCheck.erase(arcToCheck.begin());
+        //for debugging==================
+        if (puzzle[0][0].color == 'U')
+        {
+            int o = 1;
+        }
+        //===============================
+        // check consistancy of arc pair, and remove legalVal of causing grid if their is arc violation
+        isModified = gridArcCheck(arcPair);
+        if (isModified)
+        {
+            // causing grid has change in legal value, add arc of other grid to the causing grid
+            changedGridArcGen(arcPair.first);
+        }
+    }
+}
+
+// check consistancy of arc pair, and remove legalVal of causing grid if their is arc violation
+bool CPuzzle::gridArcCheck(pair<Coord, Coord> arcPair)
+{
+    bool isModified = false;
+    bool isValid = false;
+    Coord causingGrid = arcPair.first;
+    Coord effectedGrid = arcPair.second;
+    vector<char> causeLegalValCopy = puzzle[causingGrid.row][causingGrid.column].legalVal;
+    vector<char>::iterator itLegalValToDiscard;
+    for (auto &causeVal : causeLegalValCopy)
+    {
+        isValid = false;
+        puzzle[causingGrid.row][causingGrid.column].color = causeVal;
+        for (auto &effVal : puzzle[effectedGrid.row][effectedGrid.column].legalVal)
+        {
+            if (!puzzle[effectedGrid.row][effectedGrid.column].isSource)
+            {
+                puzzle[effectedGrid.row][effectedGrid.column].color = effVal;
+            }
+            isValid = puzzleViolationCheck();
+            if (!puzzle[effectedGrid.row][effectedGrid.column].isSource)
+            {
+                puzzle[effectedGrid.row][effectedGrid.column].color = 'U';
+            }
+            if (isValid)
+            {
+                break;
+            }
+        }
+        puzzle[causingGrid.row][causingGrid.column].color = 'U';
+        if (!isValid)
+        {
+            itLegalValToDiscard = find(puzzle[causingGrid.row][causingGrid.column].legalVal.begin(), puzzle[causingGrid.row][causingGrid.column].legalVal.end(), causeVal);
+            if (itLegalValToDiscard != puzzle[causingGrid.row][causingGrid.column].legalVal.end())
+            {
+                puzzle[causingGrid.row][causingGrid.column].legalVal.erase(itLegalValToDiscard);
+                puzzle[causingGrid.row][causingGrid.column].heuristic = puzzle[causingGrid.row][causingGrid.column].legalVal.size();
+            }
+
+            if (!isModified)
+            {
+                isModified = true;
+            }
+        }
+    }
+    return isModified;
+}
 
 //int main_o()
 //{
