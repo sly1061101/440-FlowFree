@@ -75,7 +75,7 @@ struct gridInfo
 	vector<char> legalVal;
 	map<int, vector<char>>  discardedValue;
 
-	void SetInfo(int row, int column, int columnSize, vector<char> colors, bool inIsSource, char inColor)
+	gridInfo(int row, int column, int columnSize, vector<char> colors, bool inIsSource, char inColor)
 	{
 		coord.row = row;
 		coord.column = column;
@@ -99,16 +99,16 @@ class CPuzzle
 {
 	const char* filePath;
 	vector<vector<char>> arr;	//raw puzzle in characters
-	vector<vector<GridInfo>> puzzle;	// 2D array of the puzzle. Each grid contains info like color, heuristic, ID etc.
+	vector<vector<GridInfo*>> puzzle;	// 2D array of the puzzle. Each grid contains info like color, heuristic, ID etc.
 	vector<char> colors;		// all values that appear in the problem
 	int rowSize;
 	int columnSize;
-	vector<pair<Coord, Coord>> arcToCheck;	//only key is used in the map for lookup, vlaue is not used.
+	vector<pair<GridInfo*, GridInfo*>> arcToCheck;	//only key is used in the map for lookup, vlaue is not used.
 private:
-	vector<Coord> pendingGrids;		// the assigned grids. Use vector to function as stack
+	vector<GridInfo*> pendingGrids;		// the assigned grids. Use vector to function as stack
 	//vector<GridInfo*> sourceGrid;		// Source grids are kept in a seperate queue. Not to be touched in the pop/push process of CSP
 	// priority_queue<GridInfo*, vector<GridInfo*>, gridInfoLess> unAssignedGrids; // grids awaiting color assignment
-	vector<Coord> unAssignedGrids;		//Heuristic is the number of legal value left
+	vector<GridInfo*> unAssignedGrids;		//Heuristic is the number of legal value left
 	int numSourceGrids;
 public:
 	unsigned int numAssignment;
@@ -123,19 +123,20 @@ public:
 	}
 	static int getHeuristic(void* inGrid) { return static_cast<GridInfo*>(inGrid)->heuristic; }
 	void initialize();
+	void destroy();
 	bool allAssigned(){return (pendingGrids.size() == (rowSize*columnSize - numSourceGrids));}
-    void assignValue(Coord grid, char val);
-	Coord chooseGrid();
-    void undoAssign(Coord grid);
+	void assignValue(GridInfo* pCoordinate, char val);
+	GridInfo* chooseGrid();
+	void undoAssign(GridInfo* grid);
 	bool puzzleViolationCheck();
 	bool gridViolationCheck(Coord position);
 	bool solve();
 	void printResult();
 	bool forwardChecking(Coord currentCoord);
-    void discardLegalVal(Coord myGrid, int discardGridID, char val);
+	void discardLegalVal(GridInfo* myGrid, int discardGridID, char val);
 	void restorAdjGridLegalVal(Coord currentCoord);
-	void restoreGridLegalVal(Coord thisGrid, int responsibleGridID);
-    vector<Coord> getAdjGrids(Coord position);
+	void restoreGridLegalVal(GridInfo* thisGrid, int responsibleGridID);
+	vector<GridInfo*> getAdjGrids(Coord coordinate);
 
 	//for Arc Consistency
 	void changedGridArcGen(Coord coordinate); //push arc of adjacent grids to me
@@ -144,5 +145,4 @@ public:
 	void puzzleArcCheck();
 	bool gridArcCheck(pair<GridInfo*, GridInfo*> arcPair);
 	void test();
-
 };
