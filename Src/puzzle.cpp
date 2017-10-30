@@ -369,9 +369,6 @@ void CPuzzle::test()
 
 void CPuzzle::printResult()
 {
-	COORD pos = { 0, 1 };
-	HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
-	SetConsoleCursorPosition(output, pos);
 
 	for (int rowIdx = 0; rowIdx < rowSize; rowIdx++)
 	{

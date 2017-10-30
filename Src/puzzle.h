@@ -4,7 +4,7 @@
 #include<iostream>
 #include <fstream>
 #include <assert.h>
-#include <Windows.h>
+//#include <Windows.h>
 #include <map>
 #include <ctime>
 
@@ -16,9 +16,9 @@ struct coord
 	int column;
 	int row;
 
-	Coord(){}	//default constructor
+	coord(){}	//default constructor
 
-	Coord(int inRow, int inColumn) : //custom constructor
+	coord(int inRow, int inColumn) : //custom constructor
 	column(inColumn),
 	row(inRow)
 	{}
@@ -76,7 +76,7 @@ struct gridInfo
 	vector<char> legalVal;
 	map<int, vector<char>>  discardedValue;
 
-	GridInfo(int row, int column, int columnSize, vector<char> colors, bool inIsSource, char inColor)
+	gridInfo(int row, int column, int columnSize, vector<char> colors, bool inIsSource, char inColor)
 	{
 		coord.row = row;
 		coord.column = column;
@@ -93,7 +93,7 @@ struct gridInfo
 		}
 		heuristic = legalVal.size();
 	}
-	GridInfo(){}
+	gridInfo(){}
 };
 
 struct gridInfoLess
