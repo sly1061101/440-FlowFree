@@ -1,5 +1,3 @@
-Last login: Mon Oct 30 02:49:17 on ttys001
-MacBook-Pro:440MP2-Flow-Free liuyi$ ./1214
 U U U P U U U U U U U K 
 U U U G U U U G U U U A 
 U U U U U U P U U Y U Y 
@@ -14,21 +12,6 @@ U U U U U U U W U U U U
 U U U U U U U U U O U U 
 U R U U U U U U U U U U 
 U U U U U U U U U U U U 
-
-12 12 12 1 12 12 12 12 12 12 12 1 
-12 12 12 1 12 12 12 1 12 12 12 1 
-12 12 12 12 12 12 1 12 12 1 12 1 
-12 12 12 12 1 12 12 12 1 12 12 12 
-12 12 1 12 12 12 12 1 1 12 12 12 
-12 12 12 12 12 1 12 1 1 12 12 1 
-12 12 12 12 12 12 12 12 12 12 12 12 
-1 12 12 1 12 12 12 12 12 12 1 12 
-12 12 12 12 12 12 1 12 12 12 12 12 
-12 12 12 12 12 12 12 12 12 12 12 12 
-12 12 12 12 12 12 12 1 12 12 12 12 
-12 12 12 12 12 12 12 12 12 1 12 12 
-12 1 12 12 12 12 12 12 12 12 12 12 
-12 12 12 12 12 12 12 12 12 12 12 12 
 
 P P P P K K K K K K K K 
 P G G G K G G G A A A A 
@@ -45,6 +28,5 @@ D D D D D D D D D O R D
 D R R R R R R R R R R D 
 D D D D D D D D D D D D 
 
-numAssignment:10440 
-time: 20012.8
-MacBook-Pro:440MP2-Flow-Free liuyi$ 
+numAssignment:144 
+time: 19077.8
