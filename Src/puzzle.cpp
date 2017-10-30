@@ -392,7 +392,7 @@ bool CPuzzle::solve()
         if (!isValid)
         {
             undoAssign(nextGrid);
-            restorAdjGridLegalVal(puzzle[nextGrid.row][nextGrid.column].coord);
+            //restorAdjGridLegalVal(puzzle[nextGrid.row][nextGrid.column].coord);
             continue;
         }
         else
@@ -405,7 +405,7 @@ bool CPuzzle::solve()
             else
             {
                 undoAssign(nextGrid);
-                restorAdjGridLegalVal(puzzle[nextGrid.row][nextGrid.column].coord);
+                //restorAdjGridLegalVal(puzzle[nextGrid.row][nextGrid.column].coord);
             }
         }
     }
@@ -437,13 +437,14 @@ void CPuzzle::discardLegalVal(Coord myGrid, int discardGridID, char val)
 
 bool CPuzzle::forwardChecking(Coord responsibleGrid)
 {
-    bool isValid = true;
     vector<char> legalValCopy;    // a copy of legalVector to iterate through. Because original vector will be shrinked during the iteration
     vector<Coord> adjGrids = getAdjGrids(responsibleGrid);
     for (auto &i: adjGrids)
     {
+        bool isValid = true;
         if(puzzle[i.row][i.column].color == 'U')
         {
+            
             //for debugging====================================
             //if (pGrid->legalVal.size() < 5)
             //{
@@ -456,18 +457,21 @@ bool CPuzzle::forwardChecking(Coord responsibleGrid)
                 puzzle[i.row][i.column].color = val;
                 isValid = puzzleViolationCheck();
                 puzzle[i.row][i.column].color = 'U';
-                if (!isValid)
+                if (isValid)
                 {
-                    discardLegalVal(i, puzzle[responsibleGrid.row][responsibleGrid.column].gridId, val);
+                    break;
+                    //discardLegalVal(i, puzzle[responsibleGrid.row][responsibleGrid.column].gridId, val);
                 }
             }
-            if (puzzle[i.row][i.column].legalVal.empty())
-            {
-                restorAdjGridLegalVal(responsibleGrid);
-                return false;
-            }
+//            if (puzzle[i.row][i.column].legalVal.empty())
+//            {
+//                restorAdjGridLegalVal(responsibleGrid);
+//                return false;
+//            }
 
         }
+        if(!isValid)
+            return false;
     }
     return true;
 }
