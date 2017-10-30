@@ -1,0 +1,44 @@
+Last login: Mon Oct 30 09:47:59 on ttys002
+MacBook-Pro:440MP2-Flow-Free liuyi$ ./1212
+U U U U U U U U U U U U 
+U U U U U U U U U U U U 
+U U U U U K U Y U G U U 
+U U U Y U U U G U U U U 
+U O U P U U U U U U Q U 
+U U U R U O Q U U U U U 
+U U U U P U A R K U U U 
+U D U U D U W U U U U U 
+U U U U U U U U U U W U 
+U U B U U U U U U U B U 
+U U U U U U U U U U A U 
+U U U U U U U U U U U U 
+
+11 11 11 11 11 11 11 11 11 11 11 11 
+11 11 11 11 11 11 11 11 11 11 11 11 
+11 11 11 11 11 1 11 1 11 1 11 11 
+11 11 11 1 11 11 11 1 11 11 11 11 
+11 1 11 1 11 11 11 11 11 11 1 11 
+11 11 11 1 11 1 1 11 11 11 11 11 
+11 11 11 11 1 11 1 1 1 11 11 11 
+11 1 11 11 1 11 1 11 11 11 11 11 
+11 11 11 11 11 11 11 11 11 11 1 11 
+11 11 1 11 11 11 11 11 11 11 1 11 
+11 11 11 11 11 11 11 11 11 11 1 11 
+11 11 11 11 11 11 11 11 11 11 11 11 
+
+K K K K K K K K K K K K 
+K O O O O O O O O O O K 
+K O K K K K Y Y G G O K 
+K O K Y Y Y Y G G O O K 
+K O K P P O O O O O Q K 
+K K K R P O Q Q Q Q Q K 
+R R R R P A A R K K K K 
+R D D D D A W R R R R R 
+R A A A A A W W W W W R 
+R A B B B B B B B B B R 
+R A A A A A A A A A A R 
+R R R R R R R R R R R R 
+
+numAssignment:1281562 
+time: 7.32668e+06
+MacBook-Pro:440MP2-Flow-Free liuyi$ 
