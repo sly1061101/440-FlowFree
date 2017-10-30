@@ -95,14 +95,6 @@ struct gridInfo
 	gridInfo(){}
 };
 
-struct gridInfoLess
-{
-	bool operator()(const GridInfo* left, const GridInfo* right) const
-	{
-		return left->heuristic < right->heuristic;
-	}
-};
-
 class CPuzzle
 {
 	const char* filePath;
