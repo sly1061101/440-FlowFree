@@ -103,10 +103,10 @@ Coord CPuzzle::chooseGrid()
             if(puzzle[i][j].color == 'U'){
                 if( (Id.row == 0) && (Id.column == 0) )
                     Id = puzzle[i][j].coord;
-//                if ( puzzle[i][j].legalVal.size() < puzzle[Id.row][Id.column].legalVal.size() )
-//                {
-//                    Id = puzzle[i][j].coord;
-//                }
+                if ( puzzle[i][j].legalVal.size() < puzzle[Id.row][Id.column].legalVal.size() )
+                {
+                    Id = puzzle[i][j].coord;
+                }
             }
         }
     }
@@ -386,7 +386,6 @@ bool CPuzzle::solve(CPuzzle *p, unsigned int *numAssignment)
     if ( allAssigned() ){
         if(p != NULL)
             (*p).SetPuzzle( (*this).puzzle );
-        (*numAssignment) += this->numAssignment;
         return true;
     }
     
@@ -418,7 +417,7 @@ bool CPuzzle::solve(CPuzzle *p, unsigned int *numAssignment)
             //undoAssign(nextGrid);
             //restorAdjGridLegalVal(puzzle[nextGrid.row][nextGrid.column].coord);
             if(p != NULL){
-                (*numAssignment) += this->numAssignment;
+                (*numAssignment) += p_next.numAssignment;
             }
             continue;
         }
@@ -435,7 +434,7 @@ bool CPuzzle::solve(CPuzzle *p, unsigned int *numAssignment)
             {
                 if(p != NULL){
                     (*p).SetPuzzle( (*this).puzzle );
-                    (*numAssignment) += this->numAssignment;
+                    (*numAssignment) += p_next.numAssignment;
                 }
                 return true;
             }
