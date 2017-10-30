@@ -81,7 +81,7 @@ bool CPuzzle::allAssigned(){
 void CPuzzle::assignValue(Coord grid, char val)
 {
     //vector<Coord>::iterator it = find(unAssignedGrids.begin(),unAssignedGrids.end(),grid);
-    numAssignment++;
+    //numAssignment++;
     puzzle[grid.row][grid.column].color = val;
 //    if (it != unAssignedGrids.end())
 //    {
@@ -397,6 +397,10 @@ bool CPuzzle::solve(CPuzzle *p, unsigned int *numAssignment)
         CPuzzle p_next = (*this);
         
         p_next.assignValue(nextGrid, it);
+        if( numAssignment == NULL)
+            this->numAssignment++;
+        else
+            (*numAssignment)++;
 
         isValid = p_next.puzzleViolationCheck();
 
@@ -416,9 +420,6 @@ bool CPuzzle::solve(CPuzzle *p, unsigned int *numAssignment)
         {
             //undoAssign(nextGrid);
             //restorAdjGridLegalVal(puzzle[nextGrid.row][nextGrid.column].coord);
-            if(p != NULL){
-                (*numAssignment) += p_next.numAssignment;
-            }
             continue;
         }
         else
@@ -432,10 +433,8 @@ bool CPuzzle::solve(CPuzzle *p, unsigned int *numAssignment)
             
             if (isValid)
             {
-                if(p != NULL){
+                if(p != NULL)
                     (*p).SetPuzzle( (*this).puzzle );
-                    (*numAssignment) += p_next.numAssignment;
-                }
                 return true;
             }
         }
