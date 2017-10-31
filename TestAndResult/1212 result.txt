@@ -1,5 +1,5 @@
-Last login: Mon Oct 30 09:47:59 on ttys002
-MacBook-Pro:440MP2-Flow-Free liuyi$ ./1212
+Last login: Mon Oct 30 17:34:46 on ttys001
+wirelessprv-10-195-204-28:TestAndResult liuyi$ ./1212
 U U U U U U U U U U U U 
 U U U U U U U U U U U U 
 U U U U U K U Y U G U U 
@@ -12,19 +12,6 @@ U U U U U U U U U U W U
 U U B U U U U U U U B U 
 U U U U U U U U U U A U 
 U U U U U U U U U U U U 
-
-11 11 11 11 11 11 11 11 11 11 11 11 
-11 11 11 11 11 11 11 11 11 11 11 11 
-11 11 11 11 11 1 11 1 11 1 11 11 
-11 11 11 1 11 11 11 1 11 11 11 11 
-11 1 11 1 11 11 11 11 11 11 1 11 
-11 11 11 1 11 1 1 11 11 11 11 11 
-11 11 11 11 1 11 1 1 1 11 11 11 
-11 1 11 11 1 11 1 11 11 11 11 11 
-11 11 11 11 11 11 11 11 11 11 1 11 
-11 11 1 11 11 11 11 11 11 11 1 11 
-11 11 11 11 11 11 11 11 11 11 1 11 
-11 11 11 11 11 11 11 11 11 11 11 11 
 
 K K K K K K K K K K K K 
 K O O O O O O O O O O K 
@@ -39,6 +26,6 @@ R A B B B B B B B B B R
 R A A A A A A A A A A R 
 R R R R R R R R R R R R 
 
-numAssignment:1281562 
-time: 7.32668e+06
-MacBook-Pro:440MP2-Flow-Free liuyi$ 
+numAssignment:81081 
+time: 8.55281e+06
+wirelessprv-10-195-204-28:TestAndResult liuyi$ 
