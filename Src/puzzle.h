@@ -143,7 +143,7 @@ public:
 	void gridArcGen(Coord coordinate);		  //push arc of me to adjacent grids
 	void puzzleArcGen();
 	bool puzzleArcCheck();
-    bool gridArcCheck(pair<Coord, Coord> arcPair);
+  bool gridArcCheck(pair<Coord, Coord> arcPair);
 	void test();
-
+  
 };

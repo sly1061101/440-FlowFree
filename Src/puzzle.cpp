@@ -651,3 +651,34 @@ bool CPuzzle::gridArcCheck(pair<Coord, Coord> arcPair)
     }
     return isModified;
 }
+
+int main()
+{
+	//char* fileNames[3] = { "1212.txt","1214.txt","1414.txt" };
+	//for (int i = 0; i < 3; i++)
+	//{
+		using namespace std;
+		clock_t begin = clock();
+
+		bool canSolve = true;
+		CPuzzle* testPuzzle = new CPuzzle("puzzle.txt");
+		testPuzzle->initialize();
+		testPuzzle->puzzleArcCheck();
+		//testPuzzle->puzzleArcGen();
+		//testPuzzle->test();
+		canSolve = testPuzzle->solve();
+		testPuzzle->printResult();
+		printf("numAssignment:%u \n", testPuzzle->numAssignment);
+		if (!canSolve)
+		{
+			printf("cannot solve problem\n \n");
+		}
+		testPuzzle->destroy();
+
+		clock_t end = clock();
+		double elapsed_secs = double(end - begin) / (CLOCKS_PER_SEC/1000);
+		cout << "time: " << elapsed_secs << endl;
+	//}
+
+	return 0;
+}
